@@ -3,6 +3,7 @@ name: Pipeline Inteligente
 on:
   workflow_dispatch:
   schedule:
+
     - cron: "0 2 * * *"
   push:
     branches:
@@ -15,13 +16,11 @@ jobs:
   job_gerador:
     runs-on: ubuntu-latest
     steps:
-      - name: Simular construção
-        run: |
+      - run: |
           mkdir -p saida_build
           echo "Relatório - $(date)" > saida_build/relatorio1.txt
           echo "Cobertura: 85%" > saida_build/relatorio2.txt
-      - name: Upload artefato
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: meus-relatorios-oficiais
           path: saida_build
@@ -30,11 +29,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: job_gerador
     steps:
-      - name: Download artefato
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: meus-relatorios-oficiais
-      - name: Verificar
-        run: |
+      - run: |
           ls -R
           cat relatorio1.txt
