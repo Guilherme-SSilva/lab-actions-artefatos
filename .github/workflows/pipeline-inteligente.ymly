@@ -1,0 +1,51 @@
+name: Pipeline Inteligente
+
+on:
+  # Regra 1: Execução manual (botão no GitHub)
+  workflow_dispatch:
+
+  # Regra 2: Agendamento diário às 02:00
+  schedule:
+    - cron: "0 2 * * *"
+
+  # Regra 3 e 4: Push com filtro de branch e path
+  push:
+    branches:
+      - "feature/*"
+    paths:
+      - "src/**"
+      - "!src/docs/**"
+
+jobs:
+  job_gerador:
+    name: Produtor de Artefatos
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Simular construção do projeto
+        run: |
+          mkdir -p saida_build
+          echo "Relatório de testes - Data: $(date)" > saida_build/relatorio1.txt
+          echo "Cobertura de código: 85%" > saida_build/relatorio2.txt
+
+      - name: Upload de artefatos
+        uses: actions/upload-artifact@v4
+        with:
+          name: meus-relatorios-oficiais
+          path: saida_build
+
+  job_auditoria:
+    name: Consumidor de Artefatos
+    runs-on: ubuntu-latest
+    needs: job_gerador
+
+    steps:
+      - name: Download de artefatos
+        uses: actions/download-artifact@v4
+        with:
+          name: meus-relatorios-oficiais
+
+      - name: Verificar arquivos recuperados
+        run: |
+          ls -R
+          cat relatorio1.txt
